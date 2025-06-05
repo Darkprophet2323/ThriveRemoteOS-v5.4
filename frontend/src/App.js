@@ -11,6 +11,9 @@ import WeatherWidget from "./components/WeatherWidget";
 import WeatherWidgetEnhanced from "./components/WeatherWidgetEnhanced";
 import DownloadManager from "./components/DownloadManager";
 import EnhancedSettings from "./components/EnhancedSettings";
+import RelocateMeIntegration from "./components/RelocateMeIntegration";
+import RealTimeLoader from "./components/RealTimeLoader";
+import LiveDataService from "./components/LiveDataIntegration";
 import { SoundProvider, useSounds } from "./components/SoundManager";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
