@@ -744,7 +744,320 @@ async def get_virtual_pets_info():
         "total_pets": 2
     }
 
-# Enhanced Dashboard and User Management
+# Download Manager API Endpoints
+@app.post("/api/downloads/start")
+async def start_download(request: DownloadRequest, session_token: str = None):
+    """Start a new download"""
+    user_id = get_current_user(session_token)
+    await get_or_create_user(user_id)
+    
+    # Extract filename from URL if not provided
+    filename = request.filename
+    if not filename:
+        filename = request.url.split('/')[-1] or f"download_{uuid.uuid4()}"
+    
+    # Determine file type
+    file_type = filename.split('.')[-1].lower() if '.' in filename else "unknown"
+    
+    download = Download(
+        user_id=user_id,
+        filename=filename,
+        url=request.url,
+        file_type=file_type,
+        category=request.category or "general",
+        status="pending"
+    )
+    
+    # Insert into database
+    await db.downloads.insert_one(download.dict())
+    
+    # Log productivity action
+    await log_productivity_action(user_id, "download_started", 5, {"filename": filename})
+    
+    return {
+        "success": True,
+        "download_id": download.id,
+        "message": f"Download started: {filename}",
+        "points_earned": 5
+    }
+
+@app.get("/api/downloads")
+async def get_downloads(session_token: str = None):
+    """Get all downloads for user"""
+    user_id = get_current_user(session_token)
+    await get_or_create_user(user_id)
+    
+    downloads = await db.downloads.find({"user_id": user_id}).sort("created_date", -1).to_list(100)
+    
+    # Convert MongoDB documents to JSON serializable format
+    converted_downloads = convert_mongo_doc(downloads)
+    
+    return {"downloads": converted_downloads}
+
+@app.get("/api/downloads/{download_id}/status")
+async def get_download_status(download_id: str, session_token: str = None):
+    """Get download status"""
+    user_id = get_current_user(session_token)
+    
+    download = await db.downloads.find_one({"id": download_id, "user_id": user_id})
+    
+    if not download:
+        raise HTTPException(status_code=404, detail="Download not found")
+    
+    converted_download = convert_mongo_doc(download)
+    return {"download": converted_download}
+
+@app.put("/api/downloads/{download_id}/progress")
+async def update_download_progress(download_id: str, progress_data: dict, session_token: str = None):
+    """Update download progress"""
+    user_id = get_current_user(session_token)
+    
+    progress = progress_data.get("progress", 0.0)
+    status = progress_data.get("status", "downloading")
+    
+    update_data = {
+        "progress": progress,
+        "status": status
+    }
+    
+    if progress >= 100.0 or status == "completed":
+        update_data["completed_date"] = datetime.now()
+        update_data["status"] = "completed"
+        # Award completion points
+        await log_productivity_action(user_id, "download_completed", 10, {"download_id": download_id})
+    
+    await db.downloads.update_one(
+        {"id": download_id, "user_id": user_id},
+        {"$set": update_data}
+    )
+    
+    return {"success": True, "message": "Progress updated"}
+
+@app.delete("/api/downloads/{download_id}")
+async def cancel_download(download_id: str, session_token: str = None):
+    """Cancel/delete download"""
+    user_id = get_current_user(session_token)
+    
+    result = await db.downloads.update_one(
+        {"id": download_id, "user_id": user_id},
+        {"$set": {"status": "cancelled"}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Download not found")
+    
+    return {"success": True, "message": "Download cancelled"}
+
+# Document Management API Endpoints  
+@app.post("/api/documents")
+async def create_document(request: DocumentRequest, session_token: str = None):
+    """Create a new document"""
+    user_id = get_current_user(session_token)
+    await get_or_create_user(user_id)
+    
+    document = Document(
+        user_id=user_id,
+        title=request.title,
+        content=request.content,
+        tags=request.tags or [],
+        category=request.category or "general"
+    )
+    
+    await db.documents.insert_one(document.dict())
+    await log_productivity_action(user_id, "document_created", 10, {"title": request.title})
+    
+    return {
+        "success": True,
+        "document_id": document.id,
+        "message": f"Document '{request.title}' created successfully",
+        "points_earned": 10
+    }
+
+@app.get("/api/documents")
+async def get_documents(session_token: str = None):
+    """Get all documents for user"""
+    user_id = get_current_user(session_token)
+    await get_or_create_user(user_id)
+    
+    documents = await db.documents.find({"user_id": user_id}).sort("modified_date", -1).to_list(100)
+    converted_documents = convert_mongo_doc(documents)
+    
+    return {"documents": converted_documents}
+
+@app.get("/api/documents/{document_id}")
+async def get_document(document_id: str, session_token: str = None):
+    """Get specific document"""
+    user_id = get_current_user(session_token)
+    
+    document = await db.documents.find_one({"id": document_id, "user_id": user_id})
+    
+    if not document:
+        raise HTTPException(status_code=404, detail="Document not found")
+    
+    converted_document = convert_mongo_doc(document)
+    return {"document": converted_document}
+
+@app.put("/api/documents/{document_id}")
+async def update_document(document_id: str, request: DocumentRequest, session_token: str = None):
+    """Update document"""
+    user_id = get_current_user(session_token)
+    
+    update_data = {
+        "title": request.title,
+        "content": request.content,
+        "tags": request.tags or [],
+        "category": request.category or "general",
+        "modified_date": datetime.now()
+    }
+    
+    result = await db.documents.update_one(
+        {"id": document_id, "user_id": user_id},
+        {"$set": update_data}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Document not found")
+    
+    await log_productivity_action(user_id, "document_updated", 5, {"title": request.title})
+    
+    return {"success": True, "message": "Document updated successfully", "points_earned": 5}
+
+@app.delete("/api/documents/{document_id}")
+async def delete_document(document_id: str, session_token: str = None):
+    """Delete document"""
+    user_id = get_current_user(session_token)
+    
+    result = await db.documents.delete_one({"id": document_id, "user_id": user_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Document not found")
+    
+    return {"success": True, "message": "Document deleted successfully"}
+
+# Weather API Endpoints
+@app.get("/api/weather/current")
+async def get_current_weather(location: str = "New York"):
+    """Get current weather data (cached)"""
+    try:
+        # Check cache first
+        cached_weather = await db.weather_cache.find_one({"location": location})
+        
+        if cached_weather and cached_weather.get("expires_at", datetime.min) > datetime.now():
+            return {
+                "success": True,
+                "location": location,
+                "weather": cached_weather["weather_data"],
+                "cached": True
+            }
+        
+        # For demo purposes, return mock weather data
+        # In production, you would integrate with actual weather API
+        mock_weather = {
+            "temperature": random.randint(15, 30),
+            "condition": random.choice(["Sunny", "Cloudy", "Partly Cloudy", "Rain", "Snow"]),
+            "humidity": random.randint(30, 80),
+            "wind_speed": random.randint(5, 25),
+            "description": "Mock weather data for demo",
+            "icon": "☀️" if random.choice([True, False]) else "☁️"
+        }
+        
+        # Cache the data for 30 minutes
+        cache_entry = {
+            "id": str(uuid.uuid4()),
+            "location": location,
+            "weather_data": mock_weather,
+            "cached_date": datetime.now(),
+            "expires_at": datetime.now() + timedelta(minutes=30)
+        }
+        
+        # Update cache
+        await db.weather_cache.update_one(
+            {"location": location},
+            {"$set": cache_entry},
+            upsert=True
+        )
+        
+        return {
+            "success": True,
+            "location": location,
+            "weather": mock_weather,
+            "cached": False
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Weather service error: {str(e)}")
+
+# File Management API Endpoints
+@app.post("/api/files/upload")
+async def upload_file(file: UploadFile = File(...), session_token: str = None):
+    """Upload a file"""
+    user_id = get_current_user(session_token)
+    await get_or_create_user(user_id)
+    
+    # For demo purposes, we'll simulate file upload
+    # In production, you would save the actual file
+    
+    file_record = FileRecord(
+        user_id=user_id,
+        filename=f"{uuid.uuid4()}_{file.filename}",
+        original_filename=file.filename,
+        file_size=0,  # Would be actual file size
+        file_type=file.content_type or "unknown",
+        file_path=f"/uploads/{user_id}/{file.filename}",
+        category="upload"
+    )
+    
+    await db.files.insert_one(file_record.dict())
+    await log_productivity_action(user_id, "file_uploaded", 5, {"filename": file.filename})
+    
+    return {
+        "success": True,
+        "file_id": file_record.id,
+        "message": f"File '{file.filename}' uploaded successfully",
+        "points_earned": 5
+    }
+
+@app.get("/api/files")
+async def get_files(session_token: str = None):
+    """Get all files for user"""
+    user_id = get_current_user(session_token)
+    await get_or_create_user(user_id)
+    
+    files = await db.files.find({"user_id": user_id}).sort("upload_date", -1).to_list(100)
+    converted_files = convert_mongo_doc(files)
+    
+    return {"files": converted_files}
+
+@app.get("/api/files/{file_id}/download")
+async def download_file(file_id: str, session_token: str = None):
+    """Download a file"""
+    user_id = get_current_user(session_token)
+    
+    file_record = await db.files.find_one({"id": file_id, "user_id": user_id})
+    
+    if not file_record:
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    # For demo purposes, return file info
+    # In production, you would return the actual file stream
+    return {
+        "success": True,
+        "file_info": convert_mongo_doc(file_record),
+        "download_url": f"/download/{file_id}",
+        "message": "File ready for download"
+    }
+
+@app.delete("/api/files/{file_id}")
+async def delete_file(file_id: str, session_token: str = None):
+    """Delete a file"""
+    user_id = get_current_user(session_token)
+    
+    result = await db.files.delete_one({"id": file_id, "user_id": user_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    return {"success": True, "message": "File deleted successfully"}
 @app.get("/api/user/current")
 async def get_current_user_info(session_token: str = None):
     """Get current user information (demo mode)"""
