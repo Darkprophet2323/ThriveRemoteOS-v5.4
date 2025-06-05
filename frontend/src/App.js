@@ -18,10 +18,7 @@ import RelocateMeIntegration from "./components/RelocateMeIntegration";
 import RealTimeLoader from "./components/RealTimeLoader";
 import ProfessionalRealTimeLoader from "./components/ProfessionalRealTimeLoader";
 import LiveDataService from "./components/LiveDataIntegration";
-import { SoundProvider, useSounds } from "./components/SoundManager";
-
-// Professional News Ticker Component (imported as LuxuryNewsTicker but is actually ProfessionalNewsTicker)
-const ProfessionalNewsTicker = LuxuryNewsTicker;
+import SleekDesktopIcons from "./components/SleekDesktopIcons";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
