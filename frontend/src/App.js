@@ -14,6 +14,7 @@ import DownloadManager from "./components/DownloadManager";
 import ProfessionalDownloadManager from "./components/ProfessionalDownloadManager";
 import EnhancedSettings from "./components/EnhancedSettings";
 import ProfessionalSettings from "./components/ProfessionalSettings";
+import QuantumTerminal from "./components/QuantumTerminal";
 import RelocateMeIntegration from "./components/RelocateMeIntegration";
 import RealTimeLoader from "./components/RealTimeLoader";
 import ProfessionalRealTimeLoader from "./components/ProfessionalRealTimeLoader";
