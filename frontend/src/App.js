@@ -329,7 +329,7 @@ const ThriveRemoteDesktop = () => {
                   <span className="menu-icon">📊</span>User Dashboard
                 </div>
                 <div className="menu-item" onClick={() => { 
-                  handleIconClick('Weather Station', 'wb_sunny', <WeatherWidgetEnhanced />, 350, 400); 
+                  handleIconClick('Weather Station', 'wb_sunny', <ProfessionalWeatherWidget />, 500, 450); 
                   setShowStartMenu(false); 
                 }}>
                   <span className="menu-icon">🌤️</span>Weather Station
