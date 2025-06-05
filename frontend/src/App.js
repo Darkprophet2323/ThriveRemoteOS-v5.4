@@ -148,7 +148,10 @@ const ThriveRemoteDesktop = () => {
       <div className="desktop-wallpaper"></div>
 
       {/* Enhanced Desktop Icons with Sound Effects */}
-      <div className="desktop-icons">
+      <SleekDesktopIcons 
+        onIconClick={handleIconClick} 
+        sounds={sounds} 
+      />
         <div 
           className="desktop-icon" 
           onClick={() => handleIconClick('AI Career Portal', 'smart_toy', <WaitressJobPortal />, 450, 325)}
