@@ -206,5 +206,3 @@ const LuxuryNewsTicker = () => {
 };
 
 export default LuxuryNewsTicker;
-
-export default LuxuryNewsTicker;
