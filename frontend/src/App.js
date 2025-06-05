@@ -8,6 +8,9 @@ import LuxuryNewsTicker from "./components/LuxuryNewsTicker";
 import NotepadApp from "./components/NotepadApp";
 import VaultApp from "./components/VaultApp";
 import WeatherWidget from "./components/WeatherWidget";
+import WeatherWidgetEnhanced from "./components/WeatherWidgetEnhanced";
+import DownloadManager from "./components/DownloadManager";
+import EnhancedSettings from "./components/EnhancedSettings";
 import { SoundProvider, useSounds } from "./components/SoundManager";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
