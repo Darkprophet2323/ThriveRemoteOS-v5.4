@@ -61,6 +61,7 @@ const EnhancedSettings = () => {
 
   const applyTheme = (theme) => {
     const root = document.documentElement;
+    document.body.className = ''; // Clear existing classes
     
     switch (theme) {
       case 'noir-gold-luxury':
@@ -68,28 +69,70 @@ const EnhancedSettings = () => {
         root.style.setProperty('--secondary-color', '#E8B4B8');
         root.style.setProperty('--background-color', '#F8F6F4');
         root.style.setProperty('--text-color', '#0D0D0D');
+        root.style.setProperty('--warm-gold', '#D4AF37');
+        root.style.setProperty('--rose-gold', '#E8B4B8');
+        root.style.setProperty('--champagne', '#F7E7CE');
+        root.style.setProperty('--noir-black', '#0D0D0D');
+        document.body.classList.add('theme-noir-gold');
         break;
       case 'dark-elegance':
         root.style.setProperty('--primary-color', '#8B4513');
         root.style.setProperty('--secondary-color', '#A0522D');
         root.style.setProperty('--background-color', '#1A1A1A');
         root.style.setProperty('--text-color', '#F5F5DC');
+        root.style.setProperty('--warm-gold', '#CD853F');
+        root.style.setProperty('--rose-gold', '#BC8F8F');
+        root.style.setProperty('--champagne', '#F5E6D3');
+        root.style.setProperty('--noir-black', '#F5F5DC');
+        document.body.classList.add('theme-dark-elegance');
         break;
       case 'champagne-dreams':
         root.style.setProperty('--primary-color', '#F7E7CE');
         root.style.setProperty('--secondary-color', '#E8B4B8');
         root.style.setProperty('--background-color', '#FDF5E6');
         root.style.setProperty('--text-color', '#2F2F2F');
+        root.style.setProperty('--warm-gold', '#DAA520');
+        root.style.setProperty('--rose-gold', '#E8B4B8');
+        root.style.setProperty('--champagne', '#F7E7CE');
+        root.style.setProperty('--noir-black', '#2F2F2F');
+        document.body.classList.add('theme-champagne-dreams');
         break;
       case 'midnight-rose':
         root.style.setProperty('--primary-color', '#C41E3A');
         root.style.setProperty('--secondary-color', '#800020');
         root.style.setProperty('--background-color', '#0D0D0D');
         root.style.setProperty('--text-color', '#F8F6F4');
+        root.style.setProperty('--warm-gold', '#FFD700');
+        root.style.setProperty('--rose-gold', '#C41E3A');
+        root.style.setProperty('--champagne', '#F8F6F4');
+        root.style.setProperty('--noir-black', '#F8F6F4');
+        document.body.classList.add('theme-midnight-rose');
         break;
       default:
         break;
     }
+    
+    // Apply additional visual effects based on settings
+    if (settings.backgroundParticles) {
+      document.body.classList.add('particles-enabled');
+    } else {
+      document.body.classList.remove('particles-enabled');
+    }
+    
+    // Apply animation speed
+    root.style.setProperty('--animation-speed', 
+      settings.animationSpeed === 'slow' ? '1.5s' :
+      settings.animationSpeed === 'fast' ? '0.3s' :
+      settings.animationSpeed === 'instant' ? '0s' : '0.6s'
+    );
+    
+    // Apply window opacity
+    root.style.setProperty('--window-opacity', settings.windowOpacity);
+    
+    // Dispatch custom event for other components to react
+    window.dispatchEvent(new CustomEvent('themeChanged', { 
+      detail: { theme, settings } 
+    }));
   };
 
   const resetSettings = () => {
