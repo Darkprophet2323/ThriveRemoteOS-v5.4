@@ -132,6 +132,65 @@ class ProductivityLog(BaseModel):
     points: int
     metadata: Dict[str, Any] = {}
 
+# Download Manager Models
+class Download(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    filename: str
+    url: str
+    size: Optional[int] = None
+    progress: float = 0.0
+    status: str = "pending"  # pending, downloading, completed, failed, cancelled
+    created_date: datetime = Field(default_factory=datetime.now)
+    completed_date: Optional[datetime] = None
+    file_type: str = ""
+    category: str = "general"
+    download_path: Optional[str] = None
+
+class DownloadRequest(BaseModel):
+    url: str
+    filename: Optional[str] = None
+    category: Optional[str] = "general"
+
+# Document Management Models
+class Document(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    title: str
+    content: str
+    created_date: datetime = Field(default_factory=datetime.now)
+    modified_date: datetime = Field(default_factory=datetime.now)
+    file_type: str = "text"
+    tags: List[str] = []
+    category: str = "general"
+
+class DocumentRequest(BaseModel):
+    title: str
+    content: str
+    tags: Optional[List[str]] = []
+    category: Optional[str] = "general"
+
+# File Management Models
+class FileRecord(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    filename: str
+    original_filename: str
+    file_size: int
+    file_type: str
+    upload_date: datetime = Field(default_factory=datetime.now)
+    file_path: str
+    category: str = "general"
+    description: Optional[str] = ""
+
+# Weather Cache Model
+class WeatherCache(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    location: str
+    weather_data: Dict[str, Any]
+    cached_date: datetime = Field(default_factory=datetime.now)
+    expires_at: datetime
+
 # Authentication utilities
 def hash_password(password: str) -> str:
     """Hash password with salt"""
