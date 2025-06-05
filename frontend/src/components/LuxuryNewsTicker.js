@@ -4,74 +4,87 @@ import axios from 'axios';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const LuxuryNewsTicker = () => {
+const ProfessionalNewsTicker = () => {
   const [currentNews, setCurrentNews] = useState(0);
   const [newsItems, setNewsItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [systemMetrics, setSystemMetrics] = useState({
+    cpu: 0,
+    memory: 0,
+    uptime: '0h'
+  });
 
-  // Default platform features news (fallback)
+  // Professional default news (fallback)
   const defaultNews = [
     {
-      icon: 'auto_fix_high',
-      text: '🎭 AI-Powered Career Acceleration • Advanced neural networks optimize your professional journey with 97.3% success rate'
+      icon: 'trending_up',
+      text: 'Professional Remote Work Platform • Real-time job matching with global opportunities'
     },
     {
-      icon: 'library_music',
-      text: '🎵 Luxury Music Integration • Stream curated music while working • Premium playlists for productivity and focus'
-    },
-    {
-      icon: 'smart_toy',
-      text: '🤖 Intelligent Job Portal • 120+ premium AI tools • Real-time matching with global opportunities'
+      icon: 'business_center',
+      text: 'Enterprise-Grade Performance • 120+ AI tools integrated for maximum productivity'
     },
     {
       icon: 'flight_takeoff',
-      text: '🌍 RelocateMe Integration • Global relocation opportunities • Visa support and moving assistance'
+      text: 'Global Relocation Services • RelocateMe integration with visa support and moving assistance'
     },
     {
       icon: 'cloud_download',
-      text: '📥 Advanced Download Manager • Track and organize downloads • Progress monitoring and file management'
+      text: 'Advanced Download Management • Professional file organization and progress tracking'
     },
     {
       icon: 'wb_sunny',
-      text: '🌤️ Live Weather Integration • Real-time weather data • Global locations with noir-themed display'
-    },
-    {
-      icon: 'palette',
-      text: '🎨 Noir-Gold Design System • Luxury aesthetic inspired by high fashion • Photorealistic effects and sophisticated color theory'
+      text: 'Live Weather Intelligence • Real-time meteorological data with air quality monitoring'
     },
     {
       icon: 'security',
-      text: '🔐 Enterprise Security • Military-grade encryption • Secure backup and restoration system'
-    },
-    {
-      icon: 'psychology',
-      text: '🧠 Behavioral Analytics • User engagement optimization • Sophisticated interface design for maximum retention'
-    },
-    {
-      icon: 'trending_up',
-      text: '📈 Real-Time Performance • Live system monitoring • Advanced metrics and insights dashboard'
+      text: 'Enterprise Security • Military-grade encryption with comprehensive data protection'
     }
   ];
 
   useEffect(() => {
     fetchLiveNews();
+    fetchSystemMetrics();
+    
+    // Refresh data periodically
+    const newsInterval = setInterval(fetchLiveNews, 5 * 60 * 1000); // 5 minutes
+    const metricsInterval = setInterval(fetchSystemMetrics, 10000); // 10 seconds
+    
+    return () => {
+      clearInterval(newsInterval);
+      clearInterval(metricsInterval);
+    };
   }, []);
+
+  const fetchSystemMetrics = async () => {
+    try {
+      const response = await axios.get(`${API}/system/performance`, { timeout: 3000 });
+      if (response.data.success) {
+        setSystemMetrics({
+          cpu: Math.round(response.data.performance.cpu_usage),
+          memory: Math.round(response.data.performance.memory_usage),
+          uptime: `${Math.round(response.data.performance.system_uptime_hours)}h`
+        });
+      }
+    } catch (error) {
+      // Silent fail for metrics
+    }
+  };
 
   const fetchLiveNews = async () => {
     try {
       const response = await axios.get(`${API}/news/live`, { timeout: 5000 });
       
       if (response.data.success && response.data.news && response.data.news.length > 0) {
-        // Convert news to ticker format
-        const liveNewsItems = response.data.news.map(news => ({
+        const liveNewsItems = response.data.news.slice(0, 4).map(news => ({
           icon: getNewsIcon(news.category),
-          text: `${getCategoryEmoji(news.category)} ${news.title} • ${news.description.substring(0, 80)}...`
+          text: `${getCategoryEmoji(news.category)} ${news.title} • ${news.source} • ${new Date(news.published_at).toLocaleDateString()}`
         }));
         
         // Mix live news with platform features
         const mixedNews = [
-          ...liveNewsItems.slice(0, 5), // First 5 live news
-          ...defaultNews.slice(0, 5) // First 5 platform features
+          ...liveNewsItems,
+          ...defaultNews.slice(0, 3)
         ];
         
         setNewsItems(mixedNews);
@@ -81,7 +94,6 @@ const LuxuryNewsTicker = () => {
       
       setLoading(false);
     } catch (error) {
-      console.warn('Live news API failed, using default news:', error.message);
       setNewsItems(defaultNews);
       setLoading(false);
     }
@@ -111,91 +123,88 @@ const LuxuryNewsTicker = () => {
     return emojis[category] || '📰';
   };
 
-  // Rotate news items every 6 seconds
+  // Rotate news items
   useEffect(() => {
     if (newsItems.length > 0) {
       const interval = setInterval(() => {
         setCurrentNews((prev) => (prev + 1) % newsItems.length);
-      }, 6000);
+      }, 8000); // 8 seconds per item
 
       return () => clearInterval(interval);
     }
   }, [newsItems.length]);
 
-  // Auto-refresh news every 5 minutes
-  useEffect(() => {
-    const refreshInterval = setInterval(() => {
-      fetchLiveNews();
-    }, 5 * 60 * 1000); // 5 minutes
-
-    return () => clearInterval(refreshInterval);
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="news-ticker">
-        <div className="ticker-label">
-          <span className="material-icons-outlined" style={{ fontSize: '0.9rem', marginRight: '6px' }}>
-            sync
-          </span>
-          LOADING
-        </div>
-        <div className="ticker-content">
-          <div className="ticker-text">
-            <div className="ticker-item">
-              <span className="material-icons-outlined">hourglass_empty</span>
-              <span>🔄 Loading live news and platform updates...</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="news-ticker">
       <div className="ticker-label">
-        <span className="material-icons-outlined" style={{ fontSize: '0.9rem', marginRight: '6px' }}>
+        <span className="material-icons-outlined" style={{ fontSize: '0.875rem', marginRight: '8px' }}>
           campaign
         </span>
-        LIVE NEWS
+        {loading ? 'LOADING' : 'LIVE NEWS'}
       </div>
+      
       <div className="ticker-content">
         <div className="ticker-text">
-          {newsItems.map((item, index) => (
+          {newsItems.length > 0 && (
             <div 
-              key={index} 
-              className={`ticker-item ${index === currentNews ? 'active' : ''}`}
+              className="ticker-item active"
               style={{
-                display: index === currentNews ? 'flex' : 'none',
+                display: 'flex',
                 alignItems: 'center',
                 gap: '8px'
               }}
             >
-              <span className="material-icons-outlined">{item.icon}</span>
-              <span>{item.text}</span>
+              <span className="material-icons-outlined">
+                {newsItems[currentNews]?.icon}
+              </span>
+              <span>{newsItems[currentNews]?.text}</span>
             </div>
-          ))}
+          )}
         </div>
       </div>
-      
+
+      {/* System Metrics */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '16px',
+        marginLeft: 'auto',
+        paddingRight: '16px',
+        fontSize: '0.75rem',
+        color: '#718096',
+        fontFamily: 'SF Mono, Monaco, Consolas, monospace'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <span>CPU</span>
+          <span style={{ fontWeight: '600', color: '#3182ce' }}>{systemMetrics.cpu}%</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <span>MEM</span>
+          <span style={{ fontWeight: '600', color: '#38a169' }}>{systemMetrics.memory}%</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <span>UP</span>
+          <span style={{ fontWeight: '600', color: '#d69e2e' }}>{systemMetrics.uptime}</span>
+        </div>
+      </div>
+
       {/* News indicator dots */}
       <div style={{
         position: 'absolute',
-        right: '15px',
+        right: '120px',
         top: '50%',
         transform: 'translateY(-50%)',
         display: 'flex',
-        gap: '4px'
+        gap: '3px'
       }}>
         {newsItems.slice(0, 5).map((_, index) => (
           <div
             key={index}
             style={{
-              width: '4px',
-              height: '4px',
+              width: '3px',
+              height: '3px',
               borderRadius: '50%',
-              background: index === currentNews % 5 ? 'var(--rose-gold)' : 'rgba(232, 180, 184, 0.3)',
+              background: index === currentNews % 5 ? '#3182ce' : 'rgba(113, 128, 150, 0.3)',
               transition: 'all 0.3s ease'
             }}
           />
@@ -204,5 +213,7 @@ const LuxuryNewsTicker = () => {
     </div>
   );
 };
+
+export default ProfessionalNewsTicker;
 
 export default LuxuryNewsTicker;
