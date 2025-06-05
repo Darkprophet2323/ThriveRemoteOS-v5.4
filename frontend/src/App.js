@@ -633,12 +633,25 @@ const AIToolsDashboard = () => {
 const LiveJobsPortal = () => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [relocateOpportunities, setRelocateOpportunities] = useState([]);
 
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const response = await axios.get(`${API}/jobs/live`);
-        setJobs(response.data.jobs || []);
+        // Fetch regular jobs
+        const jobsResponse = await axios.get(`${API}/jobs/live`);
+        setJobs(jobsResponse.data.jobs || []);
+
+        // Fetch RelocateMe opportunities
+        try {
+          const relocateResponse = await axios.get(`${API}/relocateme/opportunities`);
+          if (relocateResponse.data.success) {
+            setRelocateOpportunities(relocateResponse.data.opportunities || []);
+          }
+        } catch (relocateError) {
+          console.warn('RelocateMe API not available:', relocateError);
+        }
+
         setLoading(false);
       } catch (error) {
         console.error("Error fetching jobs:", error);
@@ -652,36 +665,155 @@ const LiveJobsPortal = () => {
   if (loading) {
     return (
       <div className="app-content">
-        <h3>💼 Loading Live Jobs...</h3>
+        <h3>💼 Loading Live Jobs & Global Opportunities...</h3>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '20px' }}>
+          <div style={{ 
+            width: '20px', 
+            height: '20px', 
+            border: '2px solid var(--warm-gold)', 
+            borderTop: '2px solid transparent', 
+            borderRadius: '50%', 
+            animation: 'spin 1s linear infinite' 
+          }}></div>
+          <span>Connecting to global job networks...</span>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="app-content">
-      <h3>💼 Live Job Listings</h3>
+      <h3>💼 Live Job Listings & Global Opportunities</h3>
+      
+      {/* Stats Summary */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+        gap: '15px',
+        marginBottom: '25px'
+      }}>
+        <div className="stat-card">
+          <h4>Remote Jobs</h4>
+          <div className="stat-value">{jobs.length}</div>
+        </div>
+        <div className="stat-card">
+          <h4>Relocation Ops</h4>
+          <div className="stat-value">{relocateOpportunities.length}</div>
+        </div>
+        <div className="stat-card">
+          <h4>Countries</h4>
+          <div className="stat-value">15+</div>
+        </div>
+        <div className="stat-card">
+          <h4>Visa Support</h4>
+          <div className="stat-value">{relocateOpportunities.filter(r => r.relocation_package?.visa_support).length}</div>
+        </div>
+      </div>
+
+      {/* RelocateMe Opportunities Section */}
+      {relocateOpportunities.length > 0 && (
+        <div style={{ marginBottom: '30px' }}>
+          <h4 style={{ color: 'var(--warm-gold)', marginBottom: '15px' }}>
+            🌍 Global Relocation Opportunities (RelocateMe)
+          </h4>
+          <div className="jobs-list">
+            {relocateOpportunities.slice(0, 3).map((opportunity, index) => (
+              <div key={opportunity.id} className="job-item" style={{
+                background: 'linear-gradient(135deg, rgba(33, 150, 243, 0.05), rgba(212, 175, 55, 0.05))',
+                border: '2px solid rgba(33, 150, 243, 0.2)'
+              }}>
+                <div className="job-header">
+                  <h4>{opportunity.title}</h4>
+                  <span className="job-salary">{opportunity.salary}</span>
+                </div>
+                <div className="job-details">
+                  <p><strong>{opportunity.company}</strong> • 🌍 {opportunity.location}</p>
+                  <div style={{ margin: '10px 0' }}>
+                    <span style={{
+                      background: 'rgba(76, 175, 80, 0.2)',
+                      color: '#4CAF50',
+                      padding: '4px 8px',
+                      borderRadius: '6px',
+                      fontSize: '0.8rem',
+                      marginRight: '8px'
+                    }}>
+                      ✈️ Visa Support
+                    </span>
+                    <span style={{
+                      background: 'rgba(33, 150, 243, 0.2)',
+                      color: '#2196F3',
+                      padding: '4px 8px',
+                      borderRadius: '6px',
+                      fontSize: '0.8rem',
+                      marginRight: '8px'
+                    }}>
+                      🏠 {opportunity.relocation_package?.temporary_housing}
+                    </span>
+                    <span style={{
+                      background: 'rgba(255, 152, 0, 0.2)',
+                      color: '#FF9800',
+                      padding: '4px 8px',
+                      borderRadius: '6px',
+                      fontSize: '0.8rem'
+                    }}>
+                      💰 {opportunity.relocation_package?.moving_allowance}
+                    </span>
+                  </div>
+                  <div className="job-skills">
+                    {opportunity.requirements?.slice(0, 3).map((req, reqIndex) => (
+                      <span key={reqIndex} className="skill-tag">{req}</span>
+                    ))}
+                  </div>
+                </div>
+                <div className="job-actions">
+                  <button 
+                    className="apply-btn"
+                    onClick={() => {
+                      // Open RelocateMe component in new window
+                      window.open('#', '_blank');
+                    }}
+                  >
+                    🌍 Apply via RelocateMe →
+                  </button>
+                  <span className="job-source">RelocateMe • Deadline: {new Date(opportunity.deadline).toLocaleDateString()}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Regular Jobs Section */}
+      <h4 style={{ color: 'var(--warm-gold)', marginBottom: '15px' }}>
+        💼 Remote Job Opportunities
+      </h4>
       <p className="stats-summary">
-        <strong>{jobs.length} opportunities</strong> available now
+        <strong>{jobs.length} opportunities</strong> available now from multiple sources
       </p>
       
       <div className="jobs-list">
-        {jobs.slice(0, 10).map((job, index) => (
-          <div key={index} className="job-item">
+        {jobs.slice(0, 12).map((job, index) => (
+          <div key={job.id || index} className="job-item">
             <div className="job-header">
               <h4>{job.title}</h4>
-              <span className="job-salary">{job.salary}</span>
+              <span className="job-salary">{job.salary || 'Competitive'}</span>
             </div>
             <div className="job-details">
               <p><strong>{job.company}</strong> • {job.location}</p>
               <p>{job.description}</p>
               <div className="job-skills">
-                {(job.skills || []).slice(0, 3).map((skill, skillIndex) => (
+                {(job.skills || []).slice(0, 4).map((skill, skillIndex) => (
                   <span key={skillIndex} className="skill-tag">{skill}</span>
                 ))}
               </div>
             </div>
             <div className="job-actions">
-              <a href={job.url} target="_blank" rel="noopener noreferrer" className="apply-btn">
+              <a 
+                href={job.url || '#'} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="apply-btn"
+              >
                 Apply Now →
               </a>
               <span className="job-source">{job.source}</span>
@@ -689,6 +821,21 @@ const LiveJobsPortal = () => {
           </div>
         ))}
       </div>
+
+      {/* Load More */}
+      {jobs.length > 12 && (
+        <div style={{ textAlign: 'center', marginTop: '25px' }}>
+          <button 
+            className="luxury-btn"
+            onClick={() => {
+              // In a real app, this would load more jobs
+              alert('Loading more opportunities...');
+            }}
+          >
+            📋 Load More Opportunities
+          </button>
+        </div>
+      )}
     </div>
   );
 };
