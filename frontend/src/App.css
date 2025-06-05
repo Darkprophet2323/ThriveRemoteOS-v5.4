@@ -365,6 +365,22 @@ body {
   display: flex;
   flex-direction: column;
   border-radius: 0 0 16px 16px;
+  position: relative;
+}
+
+.window-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('https://images.unsplash.com/photo-1562575214-da9fcf59b907');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.02;
+  z-index: 0;
+  pointer-events: none;
 }
 
 .window-content-inner {
