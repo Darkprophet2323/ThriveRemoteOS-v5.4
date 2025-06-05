@@ -199,7 +199,7 @@ const ThriveRemoteDesktop = () => {
         </div>
         <div 
           className="desktop-icon" 
-          onClick={() => handleIconClick('Download Manager', 'cloud_download', <DownloadManager />, 450, 350)}
+          onClick={() => handleIconClick('Download Manager', 'cloud_download', <ProfessionalDownloadManager />, 600, 500)}
           onMouseEnter={() => sounds.playHover()}
         >
           <div className="icon material-icons-outlined">cloud_download</div>
@@ -207,7 +207,7 @@ const ThriveRemoteDesktop = () => {
         </div>
         <div 
           className="desktop-icon" 
-          onClick={() => handleIconClick('Weather Station', 'wb_sunny', <WeatherWidgetEnhanced />, 350, 400)}
+          onClick={() => handleIconClick('Weather Station', 'wb_sunny', <ProfessionalWeatherWidget />, 500, 450)}
           onMouseEnter={() => sounds.playHover()}
         >
           <div className="icon material-icons-outlined">wb_sunny</div>
