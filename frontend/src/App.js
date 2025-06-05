@@ -140,8 +140,8 @@ const ThriveRemoteDesktop = () => {
 
   return (
     <div className="desktop-environment">
-      {/* Luxury News Ticker */}
-      <LuxuryNewsTicker />
+      {/* Professional News Ticker */}
+      <ProfessionalNewsTicker />
 
       {/* Luxury Music Player Integration */}
       <LuxuryMusicPlayer />
