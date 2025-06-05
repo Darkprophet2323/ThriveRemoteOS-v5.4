@@ -13,11 +13,15 @@ import ProfessionalWeatherWidget from "./components/ProfessionalWeatherWidget";
 import DownloadManager from "./components/DownloadManager";
 import ProfessionalDownloadManager from "./components/ProfessionalDownloadManager";
 import EnhancedSettings from "./components/EnhancedSettings";
+import ProfessionalSettings from "./components/ProfessionalSettings";
 import RelocateMeIntegration from "./components/RelocateMeIntegration";
 import RealTimeLoader from "./components/RealTimeLoader";
 import ProfessionalRealTimeLoader from "./components/ProfessionalRealTimeLoader";
 import LiveDataService from "./components/LiveDataIntegration";
-import ProfessionalSettings from "./components/ProfessionalSettings";
+import { SoundProvider, useSounds } from "./components/SoundManager";
+
+// Professional News Ticker Component (imported as LuxuryNewsTicker but is actually ProfessionalNewsTicker)
+const ProfessionalNewsTicker = LuxuryNewsTicker;
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
