@@ -215,5 +215,3 @@ const ProfessionalNewsTicker = () => {
 };
 
 export default ProfessionalNewsTicker;
-
-export default LuxuryNewsTicker;
