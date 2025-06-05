@@ -926,25 +926,42 @@ const QuantumTerminal = () => {
 function DesktopEnvironment() {
   const [bootComplete, setBootComplete] = useState(false);
 
-  // Boot sequence with luxury timing
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setBootComplete(true);
-    }, 4000);
-    return () => clearTimeout(timer);
-  }, []);
+  const handleLoadingComplete = () => {
+    // Apply saved theme settings
+    const savedSettings = localStorage.getItem('thriveRemoteSettings');
+    if (savedSettings) {
+      const settings = JSON.parse(savedSettings);
+      // Apply theme immediately
+      const root = document.documentElement;
+      
+      // Apply saved theme
+      if (settings.theme) {
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('applyTheme', { 
+            detail: { theme: settings.theme, settings } 
+          }));
+        }, 100);
+      }
+      
+      // Apply other settings
+      if (settings.fontSize) {
+        document.body.classList.add(`font-${settings.fontSize}`);
+      }
+      
+      if (settings.darkMode) {
+        document.body.classList.add('dark-mode');
+      }
+      
+      if (settings.highContrast) {
+        document.body.classList.add('high-contrast');
+      }
+    }
+    
+    setBootComplete(true);
+  };
 
   if (!bootComplete) {
-    return (
-      <div className="boot-screen">
-        <div className="boot-logo">🎭</div>
-        <div className="boot-text">ThriveRemoteOS V5.2</div>
-        <div className="boot-subtitle">Initializing Noir-Gold Luxury Platform...</div>
-        <div className="boot-progress">
-          <div className="boot-progress-bar"></div>
-        </div>
-      </div>
-    );
+    return <RealTimeLoader onComplete={handleLoadingComplete} />;
   }
 
   return <ThriveRemoteDesktop />;
