@@ -16,27 +16,12 @@ class ThriveRemoteOSAPITester(unittest.TestCase):
         print(f"\n🔍 Running test: {self._testMethodName}")
 
     def tearDown(self):
-        if hasattr(self._outcome, 'errors'):
-            # Python 3.4+
-            result = self.defaultTestResult()
-            self._feedErrorsToResult(result, self._outcome.errors)
-        else:
-            # Python 3.2 - 3.3 or 3.0 - 3.1
-            result = getattr(self, '_outcomeForDoCleanups', self._resultForDoCleanups)
-            
-        error = self.list_to_reason(result.errors)
-        failure = self.list_to_reason(result.failures)
-        
-        if error or failure:
-            print(f"❌ Test failed: {error or failure}")
-        else:
+        # Simplified tearDown
+        if self._outcome.success:
             self.tests_passed += 1
             print(f"✅ Test passed")
-
-    def list_to_reason(self, exc_list):
-        if exc_list and exc_list[-1][0] is self:
-            return exc_list[-1][1]
-        return None
+        else:
+            print(f"❌ Test failed")
 
     def test_root_endpoint(self):
         """Test the root API endpoint"""
@@ -281,8 +266,11 @@ def run_tests():
     result = runner.run(suite)
     
     # Print summary
-    tester = ThriveRemoteOSAPITester()
-    print(f"\n📊 Tests passed: {tester.tests_passed}/{tester.tests_run}")
+    print(f"\n📊 Tests summary:")
+    print(f"Tests run: {result.testsRun}")
+    print(f"Tests passed: {result.testsRun - len(result.errors) - len(result.failures)}")
+    print(f"Tests failed: {len(result.failures)}")
+    print(f"Tests with errors: {len(result.errors)}")
     
     # Return exit code based on test results
     return 0 if result.wasSuccessful() else 1
