@@ -185,6 +185,22 @@ const ThriveRemoteDesktop = () => {
         </div>
         <div 
           className="desktop-icon" 
+          onClick={() => handleIconClick('Download Manager', 'cloud_download', <DownloadManager />, 450, 350)}
+          onMouseEnter={() => sounds.playHover()}
+        >
+          <div className="icon material-icons-outlined">cloud_download</div>
+          <div className="label">downloads</div>
+        </div>
+        <div 
+          className="desktop-icon" 
+          onClick={() => handleIconClick('Weather Station', 'wb_sunny', <WeatherWidgetEnhanced />, 350, 400)}
+          onMouseEnter={() => sounds.playHover()}
+        >
+          <div className="icon material-icons-outlined">wb_sunny</div>
+          <div className="label">weather</div>
+        </div>
+        <div 
+          className="desktop-icon" 
           onClick={() => handleIconClick('File Vault', 'folder_open', <VaultApp />, 400, 300)}
           onMouseEnter={() => sounds.playHover()}
         >
@@ -201,7 +217,7 @@ const ThriveRemoteDesktop = () => {
         </div>
         <div 
           className="desktop-icon" 
-          onClick={() => handleIconClick('Luxury Settings', 'tune', <SystemSettings />, 325, 275)}
+          onClick={() => handleIconClick('Luxury Settings', 'tune', <EnhancedSettings />, 400, 350)}
           onMouseEnter={() => sounds.playHover()}
         >
           <div className="icon material-icons-outlined">tune</div>
