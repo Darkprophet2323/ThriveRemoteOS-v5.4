@@ -72,11 +72,11 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: url('https://images.unsplash.com/photo-1467232004584-a241de8bcf5d');
+  background-image: url('https://images.unsplash.com/photo-1497366754035-f200968a6e72');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  opacity: 0.4;
+  opacity: 0.6;
   z-index: 0;
 }
 
