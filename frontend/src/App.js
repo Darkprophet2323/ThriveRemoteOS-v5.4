@@ -188,6 +188,14 @@ const ThriveRemoteDesktop = () => {
         </div>
         <div 
           className="desktop-icon" 
+          onClick={() => handleIconClick('RelocateMe Global', 'flight_takeoff', <RelocateMeIntegration />, 500, 400)}
+          onMouseEnter={() => sounds.playHover()}
+        >
+          <div className="icon material-icons-outlined">flight_takeoff</div>
+          <div className="label">relocate</div>
+        </div>
+        <div 
+          className="desktop-icon" 
           onClick={() => handleIconClick('Download Manager', 'cloud_download', <DownloadManager />, 450, 350)}
           onMouseEnter={() => sounds.playHover()}
         >
