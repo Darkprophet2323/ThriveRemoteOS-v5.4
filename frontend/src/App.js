@@ -235,7 +235,7 @@ const ThriveRemoteDesktop = () => {
         </div>
         <div 
           className="desktop-icon" 
-          onClick={() => handleIconClick('Luxury Settings', 'tune', <EnhancedSettings />, 400, 350)}
+          onClick={() => handleIconClick('System Settings', 'tune', <ProfessionalSettings />, 600, 500)}
           onMouseEnter={() => sounds.playHover()}
         >
           <div className="icon material-icons-outlined">tune</div>
