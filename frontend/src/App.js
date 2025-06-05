@@ -118,9 +118,38 @@ const ThriveRemoteDesktop = () => {
   };
 
   // Enhanced desktop icon click handler
-  const handleIconClick = (title, icon, content, width, height) => {
+  const handleIconClick = (title, icon, componentName, width = 400, height = 300) => {
     sounds.playClick();
-    createWindow(title, title, content, icon, { width, height });
+    
+    // Component mapping
+    const componentMap = {
+      'WaitressJobPortal': <WaitressJobPortal />,
+      'RelocateMeIntegration': <RelocateMeIntegration />,
+      'ProfessionalDownloadManager': <ProfessionalDownloadManager />,
+      'ProfessionalWeatherWidget': <ProfessionalWeatherWidget />,
+      'VaultApp': <VaultApp />,
+      'NotepadApp': <NotepadApp />,
+      'QuantumTerminal': <QuantumTerminal />,
+      'ProfessionalSettings': <ProfessionalSettings />
+    };
+    
+    const component = componentMap[componentName] || <div>Component not found</div>;
+    
+    const newWindow = {
+      id: Date.now(),
+      title,
+      icon,
+      content: component,
+      x: Math.random() * (window.innerWidth - width - 100) + 50,
+      y: Math.random() * (window.innerHeight - height - 150) + 80,
+      width,
+      height,
+      isMinimized: false,
+      isMaximized: false,
+      zIndex: 100 + windows.length
+    };
+
+    setWindows([...windows, newWindow]);
   };
 
   if (loading) {
