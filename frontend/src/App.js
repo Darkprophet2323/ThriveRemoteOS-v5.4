@@ -790,16 +790,16 @@ const AchievementsPanel = () => {
 
 const SystemSettings = () => (
   <div className="app-content">
-    <h3>⚙️ System Settings</h3>
+    <h3>⚙️ Basic System Settings</h3>
     <div className="settings-sections">
       <div className="setting-group">
         <h4>🎨 Appearance</h4>
         <div className="setting-item">
           <label>Theme: </label>
-          <select>
-            <option>Noir-Gold Luxury</option>
-            <option>Dark Elegance</option>
-            <option>Champagne Dreams</option>
+          <select defaultValue="noir-gold-luxury">
+            <option value="noir-gold-luxury">Noir-Gold Luxury</option>
+            <option value="dark-elegance">Dark Elegance</option>
+            <option value="champagne-dreams">Champagne Dreams</option>
           </select>
         </div>
       </div>
@@ -818,6 +818,11 @@ const SystemSettings = () => (
           <input type="checkbox" defaultChecked />
         </div>
       </div>
+    </div>
+    <div style={{ marginTop: '20px', padding: '10px', background: 'rgba(212, 175, 55, 0.1)', borderRadius: '8px' }}>
+      <p style={{ fontSize: '0.9rem', color: 'var(--warm-gold)' }}>
+        💡 For advanced settings with functional theme changer and enhanced controls, use the Enhanced Settings from the desktop icon.
+      </p>
     </div>
   </div>
 );
