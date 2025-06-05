@@ -332,6 +332,12 @@ const ThriveRemoteDesktop = () => {
                   <span className="menu-icon">🌤️</span>Weather Station
                 </div>
                 <div className="menu-item" onClick={() => { 
+                  handleIconClick('RelocateMe Global', 'flight_takeoff', <RelocateMeIntegration />, 500, 400); 
+                  setShowStartMenu(false); 
+                }}>
+                  <span className="menu-icon">🌍</span>RelocateMe Opportunities
+                </div>
+                <div className="menu-item" onClick={() => { 
                   handleIconClick('Download Manager', 'cloud_download', <DownloadManager />, 450, 350); 
                   setShowStartMenu(false); 
                 }}>
