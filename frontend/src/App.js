@@ -1111,7 +1111,7 @@ function DesktopEnvironment() {
   };
 
   if (!bootComplete) {
-    return <RealTimeLoader onComplete={handleLoadingComplete} />;
+    return <ProfessionalRealTimeLoader onComplete={handleLoadingComplete} />;
   }
 
   return <ThriveRemoteDesktop />;
