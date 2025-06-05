@@ -9,10 +9,13 @@ import NotepadApp from "./components/NotepadApp";
 import VaultApp from "./components/VaultApp";
 import WeatherWidget from "./components/WeatherWidget";
 import WeatherWidgetEnhanced from "./components/WeatherWidgetEnhanced";
+import ProfessionalWeatherWidget from "./components/ProfessionalWeatherWidget";
 import DownloadManager from "./components/DownloadManager";
+import ProfessionalDownloadManager from "./components/ProfessionalDownloadManager";
 import EnhancedSettings from "./components/EnhancedSettings";
 import RelocateMeIntegration from "./components/RelocateMeIntegration";
 import RealTimeLoader from "./components/RealTimeLoader";
+import ProfessionalRealTimeLoader from "./components/ProfessionalRealTimeLoader";
 import LiveDataService from "./components/LiveDataIntegration";
 import { SoundProvider, useSounds } from "./components/SoundManager";
 
